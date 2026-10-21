@@ -36,14 +36,18 @@ jobs:
           version: 2.121.0
 
       - name: Iniciar o Supabase local
-        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,realtime
 
       - name: Recriar o banco do zero (migrações + seed fictício)
         id: reset
         run: scripts/ci-run.sh 'db reset' supabase db reset
 
       - name: Gerar tipos TypeScript a partir do esquema
-        run: supabase gen types typescript --local --schema public > src/types/database.ts
+        run: |
+          set -o pipefail
+          scripts/ci-run.sh 'gen types' supabase gen types typescript --local --schema public > /tmp/database.ts
+          # A anotação de erro (se houver) não deve ir para o arquivo de tipos.
+          grep -v '^::error' /tmp/database.ts > src/types/database.ts
 
       - name: Conferir tipos (grava na branch se mudaram; falha na main e em PRs)
         env:
