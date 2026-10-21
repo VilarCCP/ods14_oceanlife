@@ -44,6 +44,7 @@ jobs:
 
       - name: Gerar tipos TypeScript a partir do esquema
         run: |
+          mkdir -p src/types
           if ! supabase gen types typescript --local --schema public > src/types/database.ts 2> /tmp/gen-types.err; then
             msg="$(tail -n 60 /tmp/gen-types.err)"
             msg="${msg//'%'/'%25'}"; msg="${msg//$'\n'/'%0A'}"
