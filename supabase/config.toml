@@ -1,0 +1,41 @@
+# Configuração do Supabase local (CLI). Usada no CI do GitHub Actions para
+# aplicar as migrações e rodar os testes do banco. Chaves omitidas usam os
+# valores padrão da CLI.
+project_id = "oceanlife"
+
+[db]
+# Mesma versão principal do projeto na nuvem (conferir no painel do Supabase).
+major_version = 17
+
+[db.seed]
+# O seed só roda localmente/no CI (supabase db reset). Nunca vai para produção.
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[auth]
+# Decisão D1: sem cadastro público. Administradores são criados por convite.
+enable_signup = false
+
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+[storage]
+# Limite do projeto: 5 MB por imagem (doc 01 §9).
+file_size_limit = "5MiB"
+
+# Serviços desnecessários para os testes do banco.
+[studio]
+enabled = false
+
+[inbucket]
+enabled = false
+
+[realtime]
+enabled = false
+
+[edge_runtime]
+enabled = false
+
+[analytics]
+enabled = false

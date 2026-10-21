@@ -1,0 +1,59 @@
+name: Aplicar migrações (Supabase de desenvolvimento)
+
+# Disparo manual apenas (aba Actions → este workflow → Run workflow).
+# Por padrão faz só uma simulação (dry run) e lista o que seria aplicado.
+#
+# Segredos necessários (Settings → Secrets and variables → Actions):
+#   SUPABASE_ACCESS_TOKEN   token pessoal do Supabase (supabase.com/dashboard/account/tokens)
+#   SUPABASE_DB_PASSWORD    senha do banco do projeto de desenvolvimento
+#
+# O seed.sql NÃO é aplicado: ele contém apenas dados fictícios para o CI/local.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Aplicar de verdade? (desmarcado = apenas simular)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-dev
+  cancel-in-progress: false
+
+env:
+  # Identificador público do projeto de desenvolvimento (não é segredo).
+  SUPABASE_PROJECT_REF: yizuyqmqdiwtmijohrrj
+
+jobs:
+  migrate:
+    name: supabase db push
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Vincular ao projeto
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Simular (dry run)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push --dry-run
+
+      - name: Aplicar migrações
+        if: ${{ inputs.apply }}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push

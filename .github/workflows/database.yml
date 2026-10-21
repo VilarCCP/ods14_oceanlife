@@ -1,0 +1,52 @@
+name: Banco de dados
+
+# Aplica todas as migrações num Supabase local (no próprio runner do GitHub,
+# que tem Docker) e roda os testes pgTAP de restrições, RLS e Storage.
+on:
+  push:
+    branches: ['**']
+    paths: ['supabase/**', '.github/workflows/database.yml']
+  pull_request:
+    branches: [main]
+    paths: ['supabase/**', '.github/workflows/database.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Migrações e testes do banco
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar a CLI do Supabase
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Iniciar o Supabase local
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
+
+      - name: Recriar o banco do zero (migrações + seed fictício)
+        id: reset
+        run: scripts/ci-run.sh 'db reset' supabase db reset
+
+      - name: Lint do SQL (plpgsql_check)
+        run: scripts/ci-run.sh 'db lint' supabase db lint --level error --fail-on error
+
+      - name: Testes do banco (pgTAP)
+        # Roda mesmo se o lint falhar, para mostrar os dois resultados.
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        run: scripts/ci-run.sh 'test db' supabase test db
+
+      - name: Parar o Supabase local
+        if: always()
+        run: supabase stop --no-backup

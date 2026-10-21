@@ -3,7 +3,7 @@
 Plataforma educativa para explorar espécies marinhas e aprender sobre a conservação
 dos oceanos, alinhada à **ODS 14 — Vida na Água**.
 
-> Projeto em desenvolvimento. Estado atual: **fase 02 — fundação do projeto**.
+> Projeto em desenvolvimento. Estado atual: **fase 03 — banco de dados e segurança**.
 
 ## Documentação
 
@@ -75,6 +75,29 @@ tests/unit/           Testes unitários
 As pastas `src/components`, `src/services`, `src/types`, `src/lib/supabase`,
 `src/lib/validation` e `supabase/` previstas no doc 01 §5 são criadas nas fases
 que as utilizam.
+
+## Banco de dados (Supabase)
+
+- **Migrações:** `supabase/migrations/`. **Testes pgTAP:** `supabase/tests/database/`.
+- **Seed:** `supabase/seed.sql` contém apenas registros fictícios e só roda localmente/no CI.
+- O workflow **Banco de dados** aplica as migrações num Supabase local dentro do
+  GitHub Actions e roda os testes de restrições, RLS e Storage a cada mudança em `supabase/`.
+- O workflow **Aplicar migrações (Supabase de desenvolvimento)** é disparado à mão na aba
+  Actions. Por padrão só simula; marque "Aplicar de verdade" para aplicar. Ele precisa dos
+  segredos `SUPABASE_ACCESS_TOKEN` e `SUPABASE_DB_PASSWORD` no repositório.
+
+### Configuração do projeto Supabase (uma vez)
+
+1. **Authentication → Sign In / Providers:** desligue _Allow new users to sign up_.
+2. **Authentication → Users → Invite user:** convide cada administrador por e-mail.
+3. **SQL Editor:** autorize o administrador (troque o e-mail):
+
+   ```sql
+   insert into public.admin_users (user_id, note)
+   select id, 'administrador do OceanLife' from auth.users where email = 'pessoa@exemplo.com';
+   ```
+
+   Ser usuário autenticado não basta: só quem está em `admin_users` acessa o painel.
 
 ## Variáveis de ambiente
 
