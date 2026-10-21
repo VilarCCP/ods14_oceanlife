@@ -1,3 +1,5 @@
+// Fica no grupo (catalogo) para valer só para /especies: na página da espécie,
+// um carregamento em streaming impediria a resposta 404 de rascunhos e slugs inválidos.
 /** Estado de carregamento do catálogo: mesma grade, sem saltos de layout (doc 02 §5.3). */
 export default function CatalogLoading() {
   return (

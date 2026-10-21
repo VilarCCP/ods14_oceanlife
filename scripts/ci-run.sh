@@ -14,7 +14,7 @@ output_file="$(mktemp)"
 status="${PIPESTATUS[0]}"
 
 if [ "$status" -ne 0 ]; then
-  message="$(tail -n 80 "$output_file")"
+  message="$(tail -n 200 "$output_file")"
   message="${message//'%'/'%25'}"
   message="${message//$'\r'/'%0D'}"
   message="${message//$'\n'/'%0A'}"

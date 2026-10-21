@@ -82,7 +82,7 @@ jobs:
         run: npx playwright test --project=capturas
 
       - name: Publicar capturas na branch capturas/<branch>
-        if: ${{ !cancelled() && github.event_name == 'push' && github.ref_name != 'main' }}
+        if: ${{ !cancelled() && github.event_name != 'pull_request' && github.ref_name != 'main' }}
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
