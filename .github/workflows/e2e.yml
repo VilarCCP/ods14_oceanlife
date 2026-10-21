@@ -1,0 +1,112 @@
+name: E2E
+
+# Site público de ponta a ponta: Supabase local com dados fictícios, build de
+# produção do Next.js e testes no navegador (Playwright).
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'src/**'
+      - 'e2e/**'
+      - 'supabase/**'
+      - 'package-lock.json'
+      - 'playwright.config.ts'
+      - 'next.config.ts'
+      - '.github/workflows/e2e.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: Site público no navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      # Para publicar as capturas de tela na branch capturas/<branch>.
+      contents: write
+    env:
+      OCEANLIFE_E2E: '1'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Iniciar o Supabase local
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,realtime
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Exportar endereço e chaves do Supabase LOCAL
+        run: |
+          supabase status -o json > /tmp/status.json
+          url=$(jq -r '.API_URL // empty' /tmp/status.json)
+          pub=$(jq -r '.PUBLISHABLE_KEY // .ANON_KEY // empty' /tmp/status.json)
+          sec=$(jq -r '.SECRET_KEY // .SERVICE_ROLE_KEY // empty' /tmp/status.json)
+          echo "::add-mask::$pub"
+          echo "::add-mask::$sec"
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=$url"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$pub"
+            echo "SUPABASE_TEST_URL=$url"
+            echo "SUPABASE_TEST_SECRET_KEY=$sec"
+          } >> "$GITHUB_ENV"
+
+      - name: Build de produção
+        run: scripts/ci-run.sh 'build' npm run build
+
+      - name: Instalar o navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Testes E2E
+        run: scripts/ci-run.sh 'testes E2E' npx playwright test --project=desktop --project=celular
+
+      - name: Capturas de tela para revisão visual
+        if: ${{ !cancelled() }}
+        run: npx playwright test --project=capturas
+
+      - name: Publicar capturas na branch capturas/<branch>
+        if: ${{ !cancelled() && github.event_name == 'push' && github.ref_name != 'main' }}
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if ! ls e2e-capturas/*.png >/dev/null 2>&1; then exit 0; fi
+          tmp="$(mktemp -d)"
+          cp e2e-capturas/*.png "$tmp/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan capturas-temporarias
+          git rm -rf --quiet --cached .
+          mkdir -p capturas && cp "$tmp"/*.png capturas/
+          git add capturas
+          git commit --quiet -m "Capturas de tela de ${BRANCH} (${GITHUB_SHA::7})"
+          git push --force origin "HEAD:refs/heads/capturas/${BRANCH}"
+          echo "::notice title=Capturas::Publicadas na branch capturas/${BRANCH}"
+
+      - name: Relatório do Playwright
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+      - name: Parar o Supabase local
+        if: always()
+        run: supabase stop --no-backup
