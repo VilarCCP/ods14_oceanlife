@@ -5,10 +5,20 @@ name: Banco de dados
 on:
   push:
     branches: ['**']
-    paths: ['supabase/**', '.github/workflows/database.yml']
+    paths:
+      - 'supabase/**'
+      - 'src/**'
+      - 'tests/integration/**'
+      - 'package-lock.json'
+      - '.github/workflows/database.yml'
   pull_request:
     branches: [main]
-    paths: ['supabase/**', '.github/workflows/database.yml']
+    paths:
+      - 'supabase/**'
+      - 'src/**'
+      - 'tests/integration/**'
+      - 'package-lock.json'
+      - '.github/workflows/database.yml'
   workflow_dispatch:
 
 permissions:
@@ -83,6 +93,40 @@ jobs:
         # Roda mesmo se o lint falhar, para mostrar os dois resultados.
         if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
         run: scripts/ci-run.sh 'test db' supabase test db
+
+      - name: Configurar Node.js
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Instalar dependências
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        run: npm ci
+
+      - name: Exportar endereço e chaves do Supabase LOCAL para os testes
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        run: |
+          supabase status -o json > /tmp/status.json
+          echo "::notice title=Chaves disponíveis::$(jq -r 'keys | join(", ")' /tmp/status.json)"
+          url=$(jq -r '.API_URL // empty' /tmp/status.json)
+          pub=$(jq -r '.PUBLISHABLE_KEY // .ANON_KEY // empty' /tmp/status.json)
+          sec=$(jq -r '.SECRET_KEY // .SERVICE_ROLE_KEY // empty' /tmp/status.json)
+          if [ -z "$url" ] || [ -z "$pub" ] || [ -z "$sec" ]; then
+            echo "::error title=Supabase local::Não foi possível ler URL e chaves de 'supabase status'."
+            exit 1
+          fi
+          echo "::add-mask::$pub"
+          echo "::add-mask::$sec"
+          {
+            echo "SUPABASE_TEST_URL=$url"
+            echo "SUPABASE_TEST_PUBLISHABLE_KEY=$pub"
+            echo "SUPABASE_TEST_SECRET_KEY=$sec"
+          } >> "$GITHUB_ENV"
+
+      - name: Testes de integração (serviços contra a API real)
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        run: scripts/ci-run.sh 'testes de integração' npm run test:integration
 
       - name: Parar o Supabase local
         if: always()
