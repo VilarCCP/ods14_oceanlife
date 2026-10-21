@@ -85,6 +85,8 @@ A experiência principal seguirá o seguinte fluxo:
 
 Não será necessário realizar cadastro ou login para utilizar a plataforma.
 
+O conteúdo do catálogo será mantido por pessoas autorizadas em um painel administrativo privado, descrito em `03-painel-administrativo.md`. Esse painel exige login e não faz parte da experiência do visitante.
+
 ## 9. Escopo Inicial
 
 Para a primeira versão do projeto, será disponibilizado um conjunto inicial de espécies marinhas selecionadas para demonstrar a proposta da plataforma.
@@ -112,5 +114,3 @@ Essas funcionalidades não fazem parte da entrega atual e poderão ser considera
 Ao final do projeto, espera-se entregar uma experiência que una **educação, exploração e conscientização ambiental**.
 
 Mais do que simplesmente apresentar informações sobre animais marinhos, a plataforma deverá despertar curiosidade sobre a vida nos oceanos e reforçar a importância de sua preservação, contribuindo diretamente para os princípios abordados pela **ODS 14 — Vida na Água**.
-
-A principal mudança foi transformar **animações/vídeos em evolução futura**, o que também deixa o MVP bem mais viável para o seu prazo atual.

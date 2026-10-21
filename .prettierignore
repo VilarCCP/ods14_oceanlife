@@ -1,0 +1,12 @@
+.next
+out
+build
+coverage
+node_modules
+package-lock.json
+next-env.d.ts
+# Documentos originais do projeto: preservados sem reformatação.
+docs/00-escopo.md
+docs/01-arquitetura-tecnica.md
+docs/02-site-publico.md
+docs/03-painel-administrativo.md
