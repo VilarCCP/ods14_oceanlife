@@ -127,19 +127,22 @@ export default function HomePage() {
       </section>
 
       <section className="section" aria-labelledby="titulo-ods">
-        <div className="page-width prose">
-          <h2 id="titulo-ods">O OceanLife e a {siteConfig.sdg}</h2>
-          <p>
-            A ODS 14 é um dos Objetivos de Desenvolvimento Sustentável da ONU e trata da conservação
-            e do uso sustentável dos oceanos.
-          </p>
-          <p>
-            O OceanLife é um projeto educativo: ajuda a conhecer as espécies marinhas e a entender
-            por que vale a pena protegê-las. Ele não substitui as ações e metas oficiais da ODS 14.
-          </p>
-          <p>
-            <Link href="/sobre">Saiba mais sobre o projeto</Link>
-          </p>
+        <div className="page-width">
+          <div className="prose">
+            <h2 id="titulo-ods">O OceanLife e a {siteConfig.sdg}</h2>
+            <p>
+              A ODS 14 é um dos Objetivos de Desenvolvimento Sustentável da ONU e trata da
+              conservação e do uso sustentável dos oceanos.
+            </p>
+            <p>
+              O OceanLife é um projeto educativo: ajuda a conhecer as espécies marinhas e a entender
+              por que vale a pena protegê-las. Ele não substitui as ações e metas oficiais da ODS
+              14.
+            </p>
+            <p>
+              <Link href="/sobre">Saiba mais sobre o projeto</Link>
+            </p>
+          </div>
         </div>
       </section>
     </>
