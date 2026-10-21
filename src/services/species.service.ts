@@ -517,8 +517,22 @@ export async function updateSpecies(
   }
 
   try {
-    const duplicate = await checkDuplicateName(client, parsed.data.scientificName, id, options);
-    if (!duplicate.ok) return duplicate;
+    // Só avisa sobre nome repetido quando o nome científico muda; senão o
+    // administrador seria interrompido a cada edição de uma espécie já
+    // confirmada como distinta.
+    const current = await client
+      .from('species')
+      .select('scientific_name_normalized')
+      .eq('id', id)
+      .maybeSingle();
+    if (current.error) return failFromDatabase(current.error);
+    if (!current.data)
+      return fail('not_found', 'Espécie não encontrada ou sem permissão para editar.');
+
+    if (current.data.scientific_name_normalized !== normalizeText(parsed.data.scientificName)) {
+      const duplicate = await checkDuplicateName(client, parsed.data.scientificName, id, options);
+      if (!duplicate.ok) return duplicate;
+    }
 
     const { data, error } = await client
       .from('species')
@@ -640,8 +654,12 @@ export async function deleteSpecies(
     const removal = await client.storage.from(IMAGE_BUCKET).remove(paths);
     if (removal.error) return ok({ id, removedFiles: 0, orphanedFiles: paths });
 
-    const removed = new Set((removal.data ?? []).map((file) => file.name));
-    const orphaned = paths.filter((path) => !removed.has(path));
+    // O Storage devolve os objetos apagados; aceitamos o nome completo ou só o
+    // nome do arquivo, para não depender do formato da resposta.
+    const removedNames = (removal.data ?? []).map((file) => file.name);
+    const orphaned = paths.filter(
+      (path) => !removedNames.some((name) => name === path || path.endsWith(`/${name}`)),
+    );
     return ok({ id, removedFiles: paths.length - orphaned.length, orphanedFiles: orphaned });
   } catch (exception) {
     return failFromException(exception);
