@@ -34,14 +34,14 @@ begin
   limit 1;
 
   if not found then
-    v_issues := v_issues || 'missing_cover';
+    v_issues := array_append(v_issues, 'missing_cover');
   elsif coalesce(btrim(v_cover.alt_text), '') = '' then
-    v_issues := v_issues || 'missing_cover_alt';
+    v_issues := array_append(v_issues, 'missing_cover_alt');
   end if;
 
   if coalesce(btrim(v_species.short_description), '') = ''
      and coalesce(btrim(v_species.description), '') = '' then
-    v_issues := v_issues || 'missing_description';
+    v_issues := array_append(v_issues, 'missing_description');
   end if;
 
   return v_issues;
