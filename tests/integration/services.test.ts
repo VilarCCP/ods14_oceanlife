@@ -50,7 +50,7 @@ const base = {
 async function upload(
   client: TypedSupabaseClient,
   speciesId: string,
-  bytes: Uint8Array,
+  bytes: Uint8Array<ArrayBuffer>,
   mimeType: string,
 ) {
   const ticket = await createImageUpload(client, {
@@ -371,5 +371,14 @@ describe.skipIf(!hasIntegrationEnv)('serviços contra o Supabase local', () => {
     expect(!result.ok && result.error.code).toBe('not_found');
     const still = await getSpeciesForEdit(admin.client, created.data.id);
     expect(still.ok && still.data?.id).toBe(created.data.id);
+  });
+
+  it('não existe cadastro público: visitantes não conseguem criar conta', async () => {
+    const { data, error } = await anonClient().auth.signUp({
+      email: `${RUN_PREFIX}-cadastro@teste.invalid`,
+      password: `Senha-${crypto.randomUUID()}`,
+    });
+    expect(error).not.toBeNull();
+    expect(data.user).toBeNull();
   });
 });
