@@ -1,0 +1,35 @@
+# Dependências
+/node_modules
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Build e testes
+/build
+/coverage
+/test-results
+/playwright-report
+
+# Variáveis de ambiente e segredos (nunca versionar)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Supabase local
+/supabase/.branches
+/supabase/.temp
+
+# Vercel
+.vercel
+
+# Sistema e editores
+.DS_Store
+*.log
+.idea
+.vscode/*
+!.vscode/extensions.json

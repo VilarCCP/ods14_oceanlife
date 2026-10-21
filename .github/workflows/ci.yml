@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verificação (segredos, formato, lint, tipos, testes, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Verificar segredos
+        run: node scripts/check-secrets.mjs
+
+      - name: Exigir package-lock.json
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "::error::package-lock.json ausente. Gere o arquivo pelo workflow 'Gerar lockfile'."
+            exit 1
+          fi
+
+      - name: Instalar dependências (versões exatas do lockfile)
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Checagem de tipos
+        run: npm run typecheck
+
+      - name: Testes
+        run: npm run test
+
+      - name: Build de produção
+        run: npm run build
