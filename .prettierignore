@@ -10,3 +10,5 @@ docs/00-escopo.md
 docs/01-arquitetura-tecnica.md
 docs/02-site-publico.md
 docs/03-painel-administrativo.md
+# Gerado pela CLI do Supabase.
+src/types/database.ts

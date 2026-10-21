@@ -14,15 +14,20 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run",
+    "test": "vitest run --project unit",
     "test:watch": "vitest",
     "check:secrets": "node scripts/check-secrets.mjs",
-    "verify": "npm run check:secrets && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
+    "verify": "npm run check:secrets && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
+    "test:integration": "vitest run --project integration"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.118.0",
     "next": "16.4.2",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/node": "22.19.0",

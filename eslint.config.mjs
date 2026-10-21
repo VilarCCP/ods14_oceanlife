@@ -8,5 +8,5 @@ export default defineConfig([
   ...nextTs,
   // Desliga regras de estilo que conflitam com o Prettier (deve vir por último).
   prettier,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'coverage/**', 'next-env.d.ts']),
+  globalIgnores(['.next/**', 'out/**', 'build/**', 'coverage/**', 'next-env.d.ts', 'src/types/database.ts']),
 ]);

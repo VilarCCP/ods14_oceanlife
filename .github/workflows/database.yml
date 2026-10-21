@@ -23,6 +23,9 @@ jobs:
     name: Migrações e testes do banco
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    permissions:
+      # Para gravar os tipos gerados na própria branch (nunca na main).
+      contents: write
     steps:
       - name: Baixar o código
         uses: actions/checkout@v4
@@ -38,6 +41,32 @@ jobs:
       - name: Recriar o banco do zero (migrações + seed fictício)
         id: reset
         run: scripts/ci-run.sh 'db reset' supabase db reset
+
+      - name: Gerar tipos TypeScript a partir do esquema
+        run: supabase gen types typescript --local --schema public > src/types/database.ts
+
+      - name: Conferir tipos (grava na branch se mudaram; falha na main e em PRs)
+        env:
+          EVENT: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          if git ls-files --error-unmatch src/types/database.ts >/dev/null 2>&1 \
+             && git diff --quiet --exit-code -- src/types/database.ts; then
+            echo "Tipos do banco atualizados."
+            exit 0
+          fi
+          if [ "$EVENT" = "push" ] && [ "$BRANCH" != "main" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/types/database.ts
+            git commit -m "chore: atualiza tipos do banco (src/types/database.ts)"
+            git pull --rebase origin "$BRANCH"
+            git push origin "HEAD:$BRANCH"
+            echo "::notice title=Tipos do banco::src/types/database.ts foi atualizado na branch $BRANCH."
+          else
+            echo "::error title=Tipos do banco desatualizados::Rode o workflow numa branch para regenerar src/types/database.ts."
+            exit 1
+          fi
 
       - name: Lint do SQL (plpgsql_check)
         run: scripts/ci-run.sh 'db lint' supabase db lint --level error --fail-on error
