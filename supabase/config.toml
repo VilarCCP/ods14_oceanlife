@@ -17,7 +17,9 @@ sql_paths = ["./seed.sql"]
 enable_signup = false
 
 [auth.email]
-enable_signup = false
+# O provedor de e-mail continua ATIVO (é como os administradores entram).
+# O bloqueio de cadastro público vem de [auth] enable_signup = false.
+enable_signup = true
 enable_confirmations = false
 
 [storage]

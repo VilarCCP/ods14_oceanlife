@@ -10,6 +10,25 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['tests/unit/**/*.test.ts'],
+        },
+      },
+      {
+        // Contra um Supabase real (local, no CI). Ver tests/integration/README.md.
+        extends: true,
+        test: {
+          name: 'integration',
+          include: ['tests/integration/**/*.test.ts'],
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+          fileParallelism: false,
+        },
+      },
+    ],
   },
 });
