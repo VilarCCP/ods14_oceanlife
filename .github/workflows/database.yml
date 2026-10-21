@@ -44,10 +44,13 @@ jobs:
 
       - name: Gerar tipos TypeScript a partir do esquema
         run: |
-          set -o pipefail
-          scripts/ci-run.sh 'gen types' supabase gen types typescript --local --schema public > /tmp/database.ts
-          # A anotação de erro (se houver) não deve ir para o arquivo de tipos.
-          grep -v '^::error' /tmp/database.ts > src/types/database.ts
+          if ! supabase gen types typescript --local --schema public > src/types/database.ts 2> /tmp/gen-types.err; then
+            msg="$(tail -n 60 /tmp/gen-types.err)"
+            msg="${msg//'%'/'%25'}"; msg="${msg//$'\n'/'%0A'}"
+            echo "::error title=gen types::$msg"
+            exit 1
+          fi
+          head -n 5 src/types/database.ts
 
       - name: Conferir tipos (grava na branch se mudaram; falha na main e em PRs)
         env:
