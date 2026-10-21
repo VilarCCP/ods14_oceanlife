@@ -36,13 +36,16 @@ jobs:
         run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
 
       - name: Recriar o banco do zero (migrações + seed fictício)
-        run: supabase db reset
+        id: reset
+        run: scripts/ci-run.sh 'db reset' supabase db reset
 
       - name: Lint do SQL (plpgsql_check)
-        run: supabase db lint --level error --fail-on error
+        run: scripts/ci-run.sh 'db lint' supabase db lint --level error --fail-on error
 
       - name: Testes do banco (pgTAP)
-        run: supabase test db
+        # Roda mesmo se o lint falhar, para mostrar os dois resultados.
+        if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        run: scripts/ci-run.sh 'test db' supabase test db
 
       - name: Parar o Supabase local
         if: always()
