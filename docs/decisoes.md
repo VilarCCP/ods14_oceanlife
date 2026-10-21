@@ -116,6 +116,20 @@ considerada concluída sem verificação.
 | Testes de integração     | Rodam no CI contra o Supabase local. A chave secreta **local** é usada só nos testes para criar usuários; a aplicação nunca usa chave secreta (D2).                                       |
 | Login por e-mail         | O provedor de e-mail fica **ativo** (é o login dos administradores); o bloqueio é só do cadastro público (`enable_signup = false`). No painel do Supabase, não desligue o provedor Email. |
 
+## Fase 05 — site público
+
+| Tema                     | Escolha                                                                                                                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identidade visual        | Conceito **"descida pelo oceano"** (aprovado em 21/10/2026): o fundo vai da superfície iluminada ao azul profundo ao longo da página; o conteúdo de conscientização fica "no fundo".                                            |
+| Movimento                | Só de ambiente (raios de luz e partículas em CSS), nunca dos animais e nunca carregando informação. Para totalmente com "reduzir movimento". Sem números de profundidade nem nomes de zonas oceânicas (seriam dados sem fonte). |
+| Linha de profundidade    | Ponto de luz ligado à rolagem, só em telas largas e navegadores que suportam animação por rolagem; nos demais, não aparece.                                                                                                     |
+| Tipografia               | Newsreader (títulos e nomes científicos em itálico) e Atkinson Hyperlegible (texto), carregadas pelo `next/font`.                                                                                                               |
+| Contraste                | Texto claro sobre toda a coluna d'água; a cor mais clara do fundo foi escolhida para manter contraste AA com o texto.                                                                                                           |
+| Conservação e Sobre      | Conservação: estrutura com "conteúdo em preparação" até a equipe enviar textos e fontes. Sobre: texto baseado no doc 00, **para revisão da equipe**.                                                                            |
+| Imagem da página inicial | `heroImage` em `src/lib/site.ts`; enquanto não houver foto com direito de uso confirmado, a página inicial não tem imagem.                                                                                                      |
+| Renderização             | Páginas com dados do banco são renderizadas a cada visita (publicar ou retirar aparece na hora). O site usa o cliente sempre anônimo.                                                                                           |
+| Testes E2E               | Playwright no workflow **E2E**: Supabase local com dados fictícios (prefixo `e2e-`), build de produção, desktop e celular. Capturas de tela vão para a branch `capturas/<branch>` para revisão visual.                          |
+
 ## Limites dos serviços gratuitos (consultados em 21/10/2026)
 
 Os limites mudam; conferir de novo antes da publicação (fase 09).

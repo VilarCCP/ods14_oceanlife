@@ -88,15 +88,19 @@ export async function listPublishedSpecies(
       .range(from, from + pageSize - 1);
 
     if (error) {
-      // Página além do fim: o PostgREST responde "Requested range not satisfiable".
+      // Página além do fim: o PostgREST responde "Requested range not satisfiable"
+      // sem a contagem. Conta à parte para o site informar que a página não existe.
       if (error.code === 'PGRST103') {
-        return ok({
-          items: [],
-          total: count ?? 0,
-          page,
-          pageSize,
-          pageCount: pageCount(count ?? 0, pageSize),
-        });
+        let countQuery = client
+          .from('species')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_published', true);
+        if (pattern) countQuery = countQuery.ilike('search_text', pattern);
+        if (options.group) countQuery = countQuery.eq('display_group', options.group);
+        const counted = await countQuery;
+        if (counted.error) return failFromDatabase(counted.error);
+        const total = counted.count ?? 0;
+        return ok({ items: [], total, page, pageSize, pageCount: pageCount(total, pageSize) });
       }
       return failFromDatabase(error);
     }
@@ -316,13 +320,14 @@ export async function listAdminSpecies(
 
     if (error) {
       if (error.code === 'PGRST103') {
-        return ok({
-          items: [],
-          total: count ?? 0,
-          page,
-          pageSize,
-          pageCount: pageCount(count ?? 0, pageSize),
-        });
+        let countQuery = client.from('species').select('id', { count: 'exact', head: true });
+        if (pattern) countQuery = countQuery.ilike('search_text', pattern);
+        if (params.status === 'draft') countQuery = countQuery.eq('is_published', false);
+        if (params.status === 'published') countQuery = countQuery.eq('is_published', true);
+        const counted = await countQuery;
+        if (counted.error) return failFromDatabase(counted.error);
+        const total = counted.count ?? 0;
+        return ok({ items: [], total, page, pageSize, pageCount: pageCount(total, pageSize) });
       }
       return failFromDatabase(error);
     }
