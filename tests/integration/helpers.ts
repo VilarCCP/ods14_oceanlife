@@ -18,6 +18,11 @@ export const env = {
 
 export const hasIntegrationEnv = Boolean(env.url && env.publishableKey && env.secretKey);
 
+// No CI os testes de integração são obrigatórios: nunca podem ser pulados em silêncio.
+if (process.env.REQUIRE_INTEGRATION_TESTS === '1' && !hasIntegrationEnv) {
+  throw new Error('Testes de integração exigidos, mas o Supabase local não foi configurado.');
+}
+
 if (hasIntegrationEnv && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(env.url)) {
   throw new Error('Os testes de integração só podem rodar contra um Supabase local.');
 }

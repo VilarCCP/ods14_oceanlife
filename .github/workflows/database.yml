@@ -126,6 +126,8 @@ jobs:
 
       - name: Testes de integração (serviços contra a API real)
         if: ${{ !cancelled() && steps.reset.outcome == 'success' }}
+        env:
+          REQUIRE_INTEGRATION_TESTS: '1'
         run: scripts/ci-run.sh 'testes de integração' npm run test:integration
 
       - name: Parar o Supabase local

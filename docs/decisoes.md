@@ -102,6 +102,20 @@ considerada concluída sem verificação.
 | Novos administradores         | Somente por SQL (ver README). A API não permite escrever em `admin_users`, nem para administradores.                                                                                                                     |
 | Testes de exclusão no Storage | O Storage bloqueia `DELETE` direto em SQL; a remoção de arquivos é testada pela API na fase 04.                                                                                                                          |
 
+## Fase 04 — camada de dados e serviços
+
+| Tema                     | Escolha                                                                                                                                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clientes                 | Site público usa um cliente **sempre anônimo**, mesmo com administrador logado no navegador, para nunca exibir rascunhos por engano. O painel usa o cliente com a sessão (cookies).       |
+| Serviços                 | Recebem o cliente como parâmetro e devolvem `Result` (`ok`/`error`). Erros do banco viram mensagens em português sem detalhes internos.                                                   |
+| Envio de imagens (D3)    | URL assinada → envio direto ao Storage → o servidor baixa o arquivo, confere tamanho e assinatura real e só então registra. Arquivo inválido é removido.                                  |
+| Capa automática          | Não existe: a capa é sempre escolhida explicitamente (doc 01 §6.2).                                                                                                                       |
+| Nome científico repetido | Aviso com a lista de espécies parecidas; salvar exige confirmação. Na edição, só avisa quando o nome científico muda.                                                                     |
+| Exclusão                 | Banco primeiro (fonte de verdade), depois arquivos. Se o Storage falhar, a exclusão vale e os caminhos órfãos são devolvidos para o painel avisar.                                        |
+| Tipos do banco           | Gerados pela CLI no workflow **Banco de dados** e gravados na branch; na `main` e em PRs o workflow falha se estiverem desatualizados.                                                    |
+| Testes de integração     | Rodam no CI contra o Supabase local. A chave secreta **local** é usada só nos testes para criar usuários; a aplicação nunca usa chave secreta (D2).                                       |
+| Login por e-mail         | O provedor de e-mail fica **ativo** (é o login dos administradores); o bloqueio é só do cadastro público (`enable_signup = false`). No painel do Supabase, não desligue o provedor Email. |
+
 ## Limites dos serviços gratuitos (consultados em 21/10/2026)
 
 Os limites mudam; conferir de novo antes da publicação (fase 09).

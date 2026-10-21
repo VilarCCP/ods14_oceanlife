@@ -3,7 +3,7 @@
 Plataforma educativa para explorar espécies marinhas e aprender sobre a conservação
 dos oceanos, alinhada à **ODS 14 — Vida na Água**.
 
-> Projeto em desenvolvimento. Estado atual: **fase 03 — banco de dados e segurança**.
+> Projeto em desenvolvimento. Estado atual: **fase 04 — camada de dados e serviços**.
 
 ## Documentação
 
@@ -53,6 +53,18 @@ npm run dev                  # http://localhost:3000
 | `npm run test`          | Testes unitários (Vitest)                              |
 | `npm run check:secrets` | Procura credenciais em arquivos versionados            |
 | `npm run verify`        | Roda todas as verificações acima, na mesma ordem do CI |
+
+## Camada de dados
+
+- `src/lib/supabase/`: clientes do Supabase — servidor (com a sessão), público (sempre
+  anônimo, usado no site) e navegador.
+- `src/lib/validation/`: esquemas Zod dos formulários e dos parâmetros de URL.
+- `src/services/`: regras de negócio de espécies, imagens e fontes. Recebem o cliente
+  como parâmetro e devolvem `Result` com mensagens em português, sem detalhes internos.
+- `src/types/database.ts`: tipos gerados do esquema pelo workflow **Banco de dados**
+  (não editar à mão).
+- `tests/integration/`: testes dos serviços contra o Supabase local, rodados no CI
+  (`npm run test:integration` precisa das variáveis `SUPABASE_TEST_*`).
 
 ## Integração contínua
 
