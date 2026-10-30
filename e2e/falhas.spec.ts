@@ -17,22 +17,31 @@ function docker(...args: string[]) {
   execFileSync('docker', args, { stdio: 'pipe', timeout: 60_000 });
 }
 
-async function waitForRest(baseUrl: string, up: boolean) {
-  const deadline = Date.now() + 60_000;
+function restIsRunning(): boolean {
+  const output = execFileSync('docker', ['inspect', '-f', '{{.State.Running}}', REST_CONTAINER], {
+    encoding: 'utf8',
+    timeout: 30_000,
+  });
+  return output.trim() === 'true';
+}
+
+/** Espera a API de dados voltar a responder a uma consulta pública real. */
+async function waitForRestBack(baseUrl: string) {
+  const deadline = Date.now() + 90_000;
+  let last = 'sem resposta';
   while (Date.now() < deadline) {
-    let ok = false;
     try {
-      const response = await fetch(`${baseUrl}/rest/v1/`, {
+      const response = await fetch(`${baseUrl}/rest/v1/species_groups?select=slug&limit=1`, {
         headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '' },
       });
-      ok = response.status < 500;
-    } catch {
-      ok = false;
+      if (response.ok) return;
+      last = `HTTP ${response.status}`;
+    } catch (error) {
+      last = String(error);
     }
-    if (ok === up) return;
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  throw new Error(`A API de dados não ficou ${up ? 'disponível' : 'indisponível'} a tempo.`);
+  throw new Error(`A API de dados não voltou a tempo (${last}).`);
 }
 
 test.describe('com o banco indisponível', () => {
@@ -49,13 +58,14 @@ test.describe('com o banco indisponível', () => {
   });
 
   test.afterAll(async () => {
+    test.setTimeout(120_000);
     await adminContext?.close();
     docker('start', REST_CONTAINER);
-    await waitForRest(supabaseUrl, true);
+    await waitForRestBack(supabaseUrl);
   });
 
-  test('a API de dados está mesmo fora do ar', async () => {
-    await waitForRest(supabaseUrl, false);
+  test('a API de dados está mesmo fora do ar', () => {
+    expect(restIsRunning()).toBe(false);
   });
 
   const PUBLIC_FAILURES = [
