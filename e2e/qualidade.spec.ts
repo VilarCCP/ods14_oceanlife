@@ -78,9 +78,7 @@ test.describe('navegação por teclado', () => {
     await expect(page).toHaveURL(/#conteudo$/);
     // O próximo Tab sai do cabeçalho e entra no conteúdo principal.
     await page.keyboard.press('Tab');
-    const insideMain = await page.evaluate(
-      () => document.activeElement?.closest('main') !== null,
-    );
+    const insideMain = await page.evaluate(() => document.activeElement?.closest('main') !== null);
     expect(insideMain).toBe(true);
   });
 

@@ -61,7 +61,10 @@ test.describe('com o banco indisponível', () => {
   const PUBLIC_FAILURES = [
     { path: '/', message: 'Não foi possível carregar as espécies em destaque.' },
     { path: '/especies', message: 'Não foi possível carregar o catálogo.' },
-    { path: `/especies/${fixtures.featured.slug}`, message: 'Não foi possível carregar esta página' },
+    {
+      path: `/especies/${fixtures.featured.slug}`,
+      message: 'Não foi possível carregar esta página',
+    },
   ];
 
   for (const { path, message } of PUBLIC_FAILURES) {
