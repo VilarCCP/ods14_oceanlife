@@ -53,7 +53,7 @@ test.describe('acessibilidade automática (axe)', () => {
     }
 
     await page.goto(`/admin/especies?q=${encodeURIComponent(fixtures.draft.scientificName)}`);
-    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName }).click();
+    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName, exact: true }).click();
     await expect(page).toHaveURL(/\/admin\/especies\/[0-9a-f-]{36}$/);
     await expectNoAxeViolations(page);
 
@@ -104,12 +104,17 @@ test.describe('navegação por teclado', () => {
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;
-        const style = getComputedStyle(el);
-        const hasOutline = style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0;
-        const hasShadow = style.boxShadow !== 'none';
+        // O indicador pode estar no próprio elemento ou num pseudo-elemento
+        // (o cartão de espécie contorna o cartão inteiro com ::after).
+        const visible = (style: CSSStyleDeclaration) =>
+          (style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0) ||
+          style.boxShadow !== 'none';
+        const hasIndicator = [null, '::before', '::after'].some((pseudo) =>
+          visible(getComputedStyle(el, pseudo)),
+        );
         return {
           label: `${el.tagName.toLowerCase()} "${(el.textContent ?? '').trim().slice(0, 40)}"`,
-          visible: hasOutline || hasShadow,
+          visible: hasIndicator,
         };
       });
       if (!info) break;
@@ -165,7 +170,7 @@ test.describe('sessão expirada durante a edição', () => {
   }) => {
     await signIn(page, 'admin');
     await page.goto(`/admin/especies?q=${encodeURIComponent(fixtures.draft.scientificName)}`);
-    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName }).click();
+    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName, exact: true }).click();
     await expect(page).toHaveURL(/\/admin\/especies\/[0-9a-f-]{36}$/);
 
     const habitat = page.locator('#campo-habitat');
