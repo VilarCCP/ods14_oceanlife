@@ -73,8 +73,8 @@ export async function getJson(
 /** Texto externo seguro para exibir e guardar: sem caracteres de controle e com tamanho limitado. */
 export function cleanExternalText(value: unknown, max = 500): string | null {
   if (typeof value !== 'string') return null;
-  // eslint-disable-next-line no-control-regex
   const cleaned = value
+    // eslint-disable-next-line no-control-regex -- remover caracteres de controle é o objetivo
     .replace(/[\u0000-\u001f\u007f]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
