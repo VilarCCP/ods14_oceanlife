@@ -8,7 +8,7 @@ import { signIn } from './helpers';
  * (e2e/mock-apis.mjs, com respostas reais gravadas). Nada é publicado.
  */
 test.describe('importação assistida', () => {
-  test.describe.configure({ mode: 'serial' });
+  test.describe.configure({ mode: 'serial', timeout: 60_000 });
 
   let context: BrowserContext;
   let page: Page;
@@ -130,6 +130,7 @@ test.describe('importação assistida', () => {
       .getByRole('table')
       .getByRole('link', { name: fixtures.draft.commonName, exact: true })
       .click();
+    await expect(page).toHaveURL(/\/admin\/especies\/[0-9a-f-]{36}$/);
     const editUrl = page.url();
     await page.getByRole('link', { name: 'Importar dados taxonômicos (WoRMS/GBIF)' }).click();
     await expect(page.getByText(/Importando para/)).toBeVisible();

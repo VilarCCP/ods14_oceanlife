@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Verificar formatação
-        run: npm run format:check
+        run: scripts/ci-run.sh 'Formatação' npm run format:check
 
       - name: Lint
         run: scripts/ci-run.sh 'Lint' npm run lint
