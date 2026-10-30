@@ -3,7 +3,7 @@
 Plataforma educativa para explorar espécies marinhas e aprender sobre a conservação
 dos oceanos, alinhada à **ODS 14 — Vida na Água**.
 
-> Projeto em desenvolvimento. Estado atual: **fase 04 — camada de dados e serviços**.
+> Projeto em desenvolvimento. Estado atual: **fase 05 — site público**.
 
 ## Documentação
 
@@ -41,18 +41,19 @@ npm run dev                  # http://localhost:3000
 
 ## Scripts
 
-| Comando                 | O que faz                                              |
-| ----------------------- | ------------------------------------------------------ |
-| `npm run dev`           | Servidor de desenvolvimento                            |
-| `npm run build`         | Build de produção (inclui checagem de tipos)           |
-| `npm run start`         | Executa o build de produção                            |
-| `npm run lint`          | ESLint                                                 |
-| `npm run typecheck`     | Checagem de tipos do TypeScript                        |
-| `npm run format`        | Formata o código com o Prettier                        |
-| `npm run format:check`  | Confere a formatação sem alterar arquivos              |
-| `npm run test`          | Testes unitários (Vitest)                              |
-| `npm run check:secrets` | Procura credenciais em arquivos versionados            |
-| `npm run verify`        | Roda todas as verificações acima, na mesma ordem do CI |
+| Comando                 | O que faz                                                      |
+| ----------------------- | -------------------------------------------------------------- |
+| `npm run dev`           | Servidor de desenvolvimento                                    |
+| `npm run build`         | Build de produção (inclui checagem de tipos)                   |
+| `npm run start`         | Executa o build de produção                                    |
+| `npm run lint`          | ESLint                                                         |
+| `npm run typecheck`     | Checagem de tipos do TypeScript                                |
+| `npm run format`        | Formata o código com o Prettier                                |
+| `npm run format:check`  | Confere a formatação sem alterar arquivos                      |
+| `npm run test`          | Testes unitários (Vitest)                                      |
+| `npm run test:e2e`      | Testes no navegador (Playwright; exige Supabase local e build) |
+| `npm run check:secrets` | Procura credenciais em arquivos versionados                    |
+| `npm run verify`        | Roda todas as verificações acima, na mesma ordem do CI         |
 
 ## Camada de dados
 
