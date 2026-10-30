@@ -1045,6 +1045,11 @@ img {
   padding-block: var(--space-4) var(--space-6);
 }
 
+/* Itens de grid não podem crescer além da tela (ex.: tabela larga no celular). */
+.admin-main > * {
+  min-width: 0;
+}
+
 .admin-muted {
   color: var(--foam-muted);
 }

@@ -14,8 +14,10 @@ import type { TypedSupabaseClient } from './types';
  * Components, Server Actions e Route Handlers. Todas as permissões vêm da RLS.
  */
 export async function createSupabaseServerClient(): Promise<TypedSupabaseClient> {
-  const { supabaseUrl, supabasePublishableKey } = getPublicEnv();
+  // cookies() primeiro: marca a rota como dinâmica antes de ler a configuração,
+  // para que o build não tente pré-renderizar páginas com sessão.
   const cookieStore = await cookies();
+  const { supabaseUrl, supabasePublishableKey } = getPublicEnv();
 
   return createServerClient<Database>(supabaseUrl, supabasePublishableKey, {
     cookies: {

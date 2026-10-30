@@ -45,13 +45,13 @@ jobs:
         run: npm run format:check
 
       - name: Lint
-        run: npm run lint
+        run: scripts/ci-run.sh 'Lint' npm run lint
 
       - name: Checagem de tipos
-        run: npm run typecheck
+        run: scripts/ci-run.sh 'Checagem de tipos' npm run typecheck
 
       - name: Testes
-        run: npm run test
+        run: scripts/ci-run.sh 'Testes' npm run test
 
       - name: Build de produção
-        run: npm run build
+        run: scripts/ci-run.sh 'Build de produção' npm run build

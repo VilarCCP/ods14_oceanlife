@@ -35,7 +35,9 @@ test.describe('acesso ao painel', () => {
     await page.getByLabel('E-mail').fill(credentials().admin.email);
     await page.getByLabel('Senha').fill('senha-errada');
     await page.getByRole('button', { name: 'Entrar' }).click();
-    await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
+    await expect(page.getByRole('alert').filter({ hasText: 'E-mail' })).toHaveText(
+      'E-mail ou senha incorretos.',
+    );
     await expect(page.getByLabel('E-mail')).toHaveValue(credentials().admin.email);
   });
 
@@ -44,7 +46,9 @@ test.describe('acesso ao painel', () => {
     await page.getByLabel('E-mail').fill('ninguem-cadastrado@teste.invalid');
     await page.getByLabel('Senha').fill('qualquer-senha');
     await page.getByRole('button', { name: 'Entrar' }).click();
-    await expect(page.getByRole('alert')).toHaveText('E-mail ou senha incorretos.');
+    await expect(page.getByRole('alert').filter({ hasText: 'E-mail' })).toHaveText(
+      'E-mail ou senha incorretos.',
+    );
   });
 
   test('usuário autenticado sem permissão é bloqueado', async ({ page }) => {
@@ -99,14 +103,18 @@ test.describe('fluxo do administrador', () => {
 
     await page.goto('/admin/especies?status=draft');
     const table = page.getByRole('table');
-    await expect(table.getByRole('link', { name: fixtures.draft.commonName })).toBeVisible();
-    await expect(table.getByRole('link', { name: fixtures.featured.commonName })).toHaveCount(0);
+    await expect(
+      table.getByRole('link', { name: fixtures.draft.commonName, exact: true }),
+    ).toBeVisible();
+    await expect(
+      table.getByRole('link', { name: fixtures.featured.commonName, exact: true }),
+    ).toHaveCount(0);
   });
 
   test('a pesquisa da lista funciona por nome científico, sem acento', async () => {
     await page.goto(`/admin/especies?q=${encodeURIComponent('FICTITIA OCCULTA')}`);
     await expect(
-      page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName }),
+      page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName, exact: true }),
     ).toBeVisible();
     await expect(page.getByText('1 espécie', { exact: true })).toBeVisible();
   });

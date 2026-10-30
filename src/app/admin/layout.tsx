@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Todas as páginas do painel dependem da sessão: nunca são pré-renderizadas.
+export const dynamic = 'force-dynamic';
+
 export default function AdminRootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return <div className="admin">{children}</div>;
 }
