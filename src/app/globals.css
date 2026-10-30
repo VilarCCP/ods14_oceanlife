@@ -1403,6 +1403,8 @@ select.input {
 }
 
 .table-scroll {
+  /* position: relative contém os textos ocultos (posicionados) dentro da rolagem. */
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--glass-edge-strong);
   border-radius: var(--radius-control);

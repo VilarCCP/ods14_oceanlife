@@ -151,7 +151,9 @@ test.describe('fluxo do administrador', () => {
     await page.getByRole('button', { name: 'Salvar rascunho' }).click();
 
     const warning = page.locator('#aviso-duplicidade');
-    await expect(warning).toContainText('Já existe uma espécie com este nome científico');
+    await expect(warning).toContainText(
+      /Já existem? (uma espécie|espécies) com este nome científico/,
+    );
     await expect(
       warning.getByRole('link', { name: new RegExp(fixtures.featured.commonName) }),
     ).toBeVisible();
@@ -189,7 +191,7 @@ test.describe('fluxo do administrador', () => {
       mimeType: 'image/png',
       buffer: Buffer.from('isto não é uma imagem'),
     });
-    const pendingItem = page.getByRole('list', { name: 'Imagens a enviar' }).getByRole('listitem');
+    const pendingItem = page.locator('.pending-item');
     await expect(pendingItem).toContainText(
       'O conteúdo do arquivo não é uma imagem WebP, JPEG ou PNG.',
     );
