@@ -27,7 +27,9 @@ async function getSpeciesOr404(slug: string): Promise<SpeciesDetail> {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
   const result = await loadPublishedSpecies(slug);
-  if (!result.ok || !result.data) return { title: 'Espécie não encontrada' };
+  // Falha de banco não é "não encontrada": o título não pode enganar o visitante.
+  if (!result.ok) return { title: 'Não foi possível carregar a espécie' };
+  if (!result.data) return { title: 'Espécie não encontrada' };
 
   const species = result.data;
   // Metadados só com dados cadastrados, sem inventar descrição (doc 02 §12).

@@ -89,6 +89,7 @@ test.describe('com o banco indisponível', () => {
       await expect(
         page.getByText(/nenhuma espécie encontrada|ainda está sendo preparado|não encontrada/i),
       ).toHaveCount(0);
+      await expect(page).not.toHaveTitle(/não encontrada/i);
       expect(response?.status()).not.toBe(404);
       // Nenhum detalhe interno exposto.
       await expect(page.locator('body')).not.toContainText(/PGRST|fetch failed|ECONNREFUSED/i);
