@@ -9,3 +9,7 @@ servem apenas para garantir que o código entende o formato real das respostas.
 
 Quando não encontra nada, o WoRMS responde HTTP 204 sem corpo; o GBIF responde
 200 com `"matchType": "NONE"`.
+
+Recortes: `worms-carcharodon-parcial.json`, `gbif-match-carcharodon.json` e
+`worms-sinonimo.json` guardam só alguns campos de cada registro (os demais foram
+removidos ao gravar). Os outros arquivos são as respostas completas.

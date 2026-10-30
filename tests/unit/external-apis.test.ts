@@ -182,16 +182,18 @@ describe('GBIF', () => {
     expect(isStrongGbifMatch(result.data[0]!)).toBe(true);
   });
 
-  it('correspondência de nível superior vem com alternativas para escolha', async () => {
+  it('correspondência de nível superior traz alternativas; candidato sem nome é descartado', async () => {
+    // Na amostra gravada, a melhor correspondência (HIGHERRANK) veio só com
+    // usageKey, sem nome: não há o que mostrar, então ela não vira opção.
     const result = await matchGbifName(
       'Carcharodon',
       respond(fixture('gbif-match-carcharodon.json')),
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.data[0]?.matchType).toBe('HIGHERRANK');
-    expect(isStrongGbifMatch(result.data[0]!)).toBe(false);
-    expect(result.data.map((c) => c.usageKey)).toEqual([2420693, 11699867, 12043086]);
+    expect(result.data.map((c) => c.usageKey)).toEqual([11699867, 12043086]);
+    expect(result.data[1]).toMatchObject({ matchType: 'FUZZY', status: 'SYNONYM' });
+    expect(isStrongGbifMatch(result.data[1]!)).toBe(false);
   });
 
   it('sem correspondência (matchType NONE) é "nenhum resultado"', async () => {
