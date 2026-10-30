@@ -3,10 +3,14 @@ name: Gerar lockfile
 # Gera ou atualiza o package-lock.json a partir do package.json e grava o
 # resultado na própria branch. Roda automaticamente quando o package.json
 # muda numa branch que não seja a main, e pode ser disparado manualmente.
+#
+# Para adicionar uma dependência de desenvolvimento sem acesso ao registro npm,
+# liste o nome em scripts/novas-dependencias-dev.txt (um por linha): o workflow
+# instala a versão estável atual com versão exata e remove o arquivo.
 on:
   push:
     branches-ignore: [main]
-    paths: [package.json]
+    paths: [package.json, scripts/novas-dependencias-dev.txt]
   workflow_dispatch:
 
 permissions:
@@ -23,17 +27,29 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Adicionar dependências de desenvolvimento pedidas
+        run: |
+          file=scripts/novas-dependencias-dev.txt
+          if [ -f "$file" ]; then
+            deps=$(grep -vE '^\s*(#|$)' "$file" | tr '\n' ' ')
+            if [ -n "$deps" ]; then
+              npm install --save-dev --save-exact --package-lock-only --ignore-scripts --no-audit --no-fund $deps
+              echo "::notice title=Dependências adicionadas::$deps"
+            fi
+            git rm -q "$file"
+          fi
+
       - name: Gerar package-lock.json
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
       - name: Gravar o lockfile na branch, se mudou
         run: |
-          if git diff --quiet --exit-code -- package-lock.json && git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+          if git diff --quiet --exit-code HEAD -- package.json package-lock.json scripts && git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
             echo "package-lock.json já está atualizado."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore: atualiza package-lock.json"
+          git add package.json package-lock.json
+          git commit -m "chore: atualiza dependências e package-lock.json"
           git push

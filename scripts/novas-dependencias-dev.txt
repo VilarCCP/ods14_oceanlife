@@ -1,0 +1,2 @@
+# Uma dependência de desenvolvimento por linha (ver .github/workflows/lockfile.yml).
+@axe-core/playwright
