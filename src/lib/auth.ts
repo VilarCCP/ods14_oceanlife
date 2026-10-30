@@ -46,10 +46,11 @@ export const getAuthState = cache(async (): Promise<AuthState> => {
   if (!data.user) return { status: 'anonymous' };
 
   const admin = await client.rpc('is_admin');
-  if (admin.error) {
-    if (/fetch failed|network/i.test(admin.error.message)) throw new AuthUnavailableError();
-    return { status: 'forbidden', email: data.user.email ?? null };
-  }
+  // is_admin() pode ser chamada por qualquer usuário autenticado e só devolve
+  // true/false. Um erro aqui é falha do banco ou da rede, nunca "sem permissão":
+  // tratar como permissão negada mostraria a um administrador que ele perdeu o
+  // acesso quando o banco está fora do ar (achado na fase 08).
+  if (admin.error) throw new AuthUnavailableError();
   if (admin.data !== true) return { status: 'forbidden', email: data.user.email ?? null };
 
   return { status: 'admin', client, userId: data.user.id, email: data.user.email ?? null };

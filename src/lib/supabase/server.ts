@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { getPublicEnv } from '@/lib/env';
 import type { Database } from '@/types/database';
 
+import { fetchWithTimeout } from './fetch';
 import type { TypedSupabaseClient } from './types';
 
 /**
@@ -20,6 +21,7 @@ export async function createSupabaseServerClient(): Promise<TypedSupabaseClient>
   const { supabaseUrl, supabasePublishableKey } = getPublicEnv();
 
   return createServerClient<Database>(supabaseUrl, supabasePublishableKey, {
+    global: { fetch: fetchWithTimeout },
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -47,5 +49,6 @@ export function createSupabasePublicClient(): TypedSupabaseClient {
   const { supabaseUrl, supabasePublishableKey } = getPublicEnv();
   return createClient<Database>(supabaseUrl, supabasePublishableKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    global: { fetch: fetchWithTimeout },
   });
 }
