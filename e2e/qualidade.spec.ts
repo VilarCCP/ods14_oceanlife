@@ -53,7 +53,10 @@ test.describe('acessibilidade automática (axe)', () => {
     }
 
     await page.goto(`/admin/especies?q=${encodeURIComponent(fixtures.draft.scientificName)}`);
-    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName, exact: true }).click();
+    await page
+      .getByRole('table')
+      .getByRole('link', { name: fixtures.draft.commonName, exact: true })
+      .click();
     await expect(page).toHaveURL(/\/admin\/especies\/[0-9a-f-]{36}$/);
     await expectNoAxeViolations(page);
 
@@ -170,7 +173,10 @@ test.describe('sessão expirada durante a edição', () => {
   }) => {
     await signIn(page, 'admin');
     await page.goto(`/admin/especies?q=${encodeURIComponent(fixtures.draft.scientificName)}`);
-    await page.getByRole('table').getByRole('link', { name: fixtures.draft.commonName, exact: true }).click();
+    await page
+      .getByRole('table')
+      .getByRole('link', { name: fixtures.draft.commonName, exact: true })
+      .click();
     await expect(page).toHaveURL(/\/admin\/especies\/[0-9a-f-]{36}$/);
 
     const habitat = page.locator('#campo-habitat');
