@@ -2,12 +2,16 @@ name: E2E
 
 # Site público de ponta a ponta: Supabase local com dados fictícios, build de
 # produção do Next.js e testes no navegador (Playwright).
+# Observação: commits gravados por workflows (lockfile, formatação, tipos) usam o
+# token do GitHub e não disparam outros workflows; nesses casos, rode este
+# workflow manualmente pela aba Actions ou com um novo push.
 on:
   push:
     branches: ['**']
     paths:
       - 'src/**'
       - 'e2e/**'
+      - 'tests/fixtures/**'
       - 'supabase/**'
       - 'package-lock.json'
       - 'playwright.config.ts'
@@ -34,6 +38,9 @@ jobs:
       contents: write
     env:
       OCEANLIFE_E2E: '1'
+      # WoRMS e GBIF simulados (e2e/mock-apis.mjs), com respostas reais gravadas.
+      WORMS_API_URL: http://127.0.0.1:4010/worms
+      GBIF_API_URL: http://127.0.0.1:4010/gbif
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v4

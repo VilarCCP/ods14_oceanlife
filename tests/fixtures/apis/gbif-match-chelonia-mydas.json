@@ -1,0 +1,22 @@
+{
+  "usageKey": 2442225,
+  "scientificName": "Chelonia mydas (Linnaeus, 1758)",
+  "canonicalName": "Chelonia mydas",
+  "rank": "SPECIES",
+  "status": "ACCEPTED",
+  "confidence": 97,
+  "note": "Similarity: name=110; authorship=0; classification=-2; rank=6; status=1; score=115; nextMatch=0",
+  "matchType": "EXACT",
+  "kingdom": "Animalia",
+  "phylum": "Chordata",
+  "family": "Cheloniidae",
+  "genus": "Chelonia",
+  "species": "Chelonia mydas",
+  "kingdomKey": 1,
+  "phylumKey": 44,
+  "classKey": 11418114,
+  "familyKey": 9413,
+  "genusKey": 2441864,
+  "speciesKey": 2442225,
+  "class": "Testudines"
+}

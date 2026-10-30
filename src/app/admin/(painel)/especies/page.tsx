@@ -48,9 +48,14 @@ export default async function AdminSpeciesListPage({
     <>
       <div className="admin-page-head">
         <h1>Espécies</h1>
-        <Link className="button" href="/admin/especies/nova">
-          Cadastrar espécie
-        </Link>
+        <div className="form-actions">
+          <Link className="button button--quiet" href="/admin/especies/importar">
+            Importar do WoRMS/GBIF
+          </Link>
+          <Link className="button" href="/admin/especies/nova">
+            Cadastrar espécie
+          </Link>
+        </div>
       </div>
 
       {deleted ? (

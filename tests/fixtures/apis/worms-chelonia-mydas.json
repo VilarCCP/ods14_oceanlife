@@ -1,0 +1,32 @@
+[
+  {
+    "AphiaID": 137206,
+    "url": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=137206",
+    "scientificname": "Chelonia mydas",
+    "authority": "(Linnaeus, 1758)",
+    "status": "accepted",
+    "unacceptreason": null,
+    "taxonRankID": 220,
+    "rank": "Species",
+    "valid_AphiaID": 137206,
+    "valid_name": "Chelonia mydas",
+    "valid_authority": "(Linnaeus, 1758)",
+    "parentNameUsageID": 137067,
+    "originalNameUsageID": 1375871,
+    "kingdom": "Animalia",
+    "phylum": "Chordata",
+    "class": null,
+    "order": "Testudines",
+    "family": "Cheloniidae",
+    "genus": "Chelonia",
+    "citation": "Uetz, P. (ed.) (2026). The Reptile Database. Chelonia mydas (Linnaeus, 1758). Accessed through: World Register of Marine Species at: https://www.marinespecies.org/aphia.php?p=taxdetails&id=137206 on 2026-10-30",
+    "lsid": "urn:lsid:marinespecies.org:taxname:137206",
+    "isMarine": 1,
+    "isBrackish": null,
+    "isFreshwater": null,
+    "isTerrestrial": null,
+    "isExtinct": null,
+    "match_type": "exact",
+    "modified": "2019-09-09T20:15:59.473Z"
+  }
+]

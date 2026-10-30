@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Verificar formatação
-        run: npm run format:check
+        run: scripts/ci-run.sh 'Formatação' npm run format:check
 
       - name: Lint
         run: scripts/ci-run.sh 'Lint' npm run lint
@@ -55,3 +55,21 @@ jobs:
 
       - name: Build de produção
         run: scripts/ci-run.sh 'Build de produção' npm run build
+
+  contract:
+    name: Contrato das APIs externas (não bloqueante)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Instabilidade do WoRMS ou do GBIF não deve bloquear o desenvolvimento;
+    # o resultado aparece como aviso na execução.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci
+      - name: Testes de contrato (WoRMS e GBIF reais)
+        env:
+          RUN_CONTRACT_TESTS: '1'
+        run: scripts/ci-run.sh 'contrato das APIs' npm run test:contract

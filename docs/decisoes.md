@@ -146,6 +146,23 @@ considerada concluída sem verificação.
 | Resumo                      | Só publicadas e rascunhos. "Itens incompletos" ficou de fora por não haver contagem confiável sem consultar cada espécie.                                                                                                             |
 | Testes                      | E2E do painel com administrador e usuário comum criados no Supabase local a cada execução (senhas aleatórias, removidos ao final).                                                                                                    |
 
+## Fase 07 — integrações externas (WoRMS e GBIF)
+
+| Tema                    | Escolha                                                                                                                                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WoRMS (fonte principal) | API REST oficial: `AphiaRecordsByName` (parcial, só marinhos), `AphiaRecordByAphiaID` e `AphiaVernacularsByAphiaID`. HTTP 204 = nenhum resultado. Sinônimos aparecem marcados com o nome aceito.                                                   |
+| GBIF (complementar)     | `GET /v1/species/match?verbose=true` e `GET /v1/species/{key}` (GBIF Backbone Taxonomy). O GBIF informa que a Backbone não recebe mais atualizações; por isso é só complementar. Correspondências aproximadas ou de nível superior ficam marcadas. |
+| O que é sugerido        | Só o que a fonte fornece: nome científico, classificação (reino a família), nome popular **em português** quando existir, AphiaID e usageKey. Nunca dieta, habitat, comportamento, expectativa de vida, curiosidades ou conservação.               |
+| Escolha                 | Sempre explícita, inclusive "Não usar o WoRMS/GBIF". Nada é escolhido sozinho em nomes ambíguos.                                                                                                                                                   |
+| Revisão                 | Cada campo mostra a origem (sugerido pelo WoRMS/GBIF, editado ou preenchido pela equipe). O grupo educativo não vem das fontes.                                                                                                                    |
+| Espécie existente       | Campos vazios recebem a sugestão; campos preenchidos só são substituídos com confirmação por campo. A situação de publicação não muda.                                                                                                             |
+| Segurança               | Consultas só no servidor (Server Actions de administrador). O servidor busca de novo o registro escolhido ao revisar e ao salvar; o navegador só envia escolhas e edições. Texto externo é limpo e exibido só como texto.                          |
+| Fontes registradas      | `provider`, URL do registro, identificador, data de consulta (horário de Brasília), atribuição (citação do WoRMS / GBIF Backbone Taxonomy) e os campos mantidos como sugeridos. Reimportar atualiza a fonte em vez de duplicar.                    |
+| Duplicidade             | Mesmo AphiaID/usageKey já cadastrado bloqueia o cadastro novo (com link para a espécie); mesmo nome científico pede confirmação.                                                                                                                   |
+| Falhas e limites        | Tempo limite de 10 s; mensagens para nenhum resultado, limite de requisições, indisponibilidade e formato inesperado; cadastro manual sempre disponível. Consultas só ao clicar (sem busca automática); respostas reaproveitadas por 1 dia.        |
+| Testes                  | Unitários com respostas reais gravadas (`tests/fixtures/apis`); E2E com servidor simulado (`e2e/mock-apis.mjs`); contrato contra as APIs reais num job do CI não bloqueante.                                                                       |
+| Termos de uso           | WoRMS: citar a fonte (o registro traz a citação) e o WoRMS Editorial Board (doi:10.14284/170). GBIF: atribuição no estilo CC BY, sem garantia de exatidão dos dados. Ambos registrados em cada fonte.                                              |
+
 ## Limites dos serviços gratuitos (consultados em 21/10/2026)
 
 Os limites mudam; conferir de novo antes da publicação (fase 09).

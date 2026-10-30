@@ -3,7 +3,7 @@
 Plataforma educativa para explorar espécies marinhas e aprender sobre a conservação
 dos oceanos, alinhada à **ODS 14 — Vida na Água**.
 
-> Projeto em desenvolvimento. Estado atual: **fase 06 — painel administrativo**.
+> Projeto em desenvolvimento. Estado atual: **fase 07 — integrações externas**.
 
 ## Documentação
 
@@ -133,6 +133,13 @@ autorização veem um aviso de acesso negado. No painel é possível:
 
 O formulário guarda no navegador uma cópia das alterações não salvas; se a sessão expirar,
 é possível entrar de novo e recuperá-las.
+
+### Importação do WoRMS e do GBIF
+
+Em **Espécies → Importar do WoRMS/GBIF** (ou "Importar dados taxonômicos" na página de uma
+espécie): pesquise o nome científico, escolha o registro e revise. Só são sugeridos nome
+científico, classificação, nome popular em português (quando existir) e identificadores.
+A espécie é salva como rascunho, com as fontes registradas; nada é publicado.
 
 ## Variáveis de ambiente
 

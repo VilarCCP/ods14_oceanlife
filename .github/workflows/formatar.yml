@@ -1,0 +1,44 @@
+name: Formatar código
+
+# Aplica o Prettier na versão exata do projeto (package-lock.json) e grava o
+# resultado na própria branch. Evita diferenças entre versões locais do
+# Prettier. Nunca roda na main: lá o CI apenas confere a formatação.
+on:
+  push:
+    branches-ignore: [main, 'capturas/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: formatar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - run: npm ci --ignore-scripts
+
+      - name: Formatar
+        run: npm run format
+
+      - name: Gravar na branch, se mudou
+        run: |
+          if git diff --quiet; then
+            echo "Formatação já está correta."
+            exit 0
+          fi
+          git diff --name-only | sed 's/^/::notice title=Formatado::/'
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "style: aplica o Prettier do projeto"
+          git push

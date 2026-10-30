@@ -1,0 +1,26 @@
+{
+  "usageKey": 2420693,
+  "matchType": "HIGHERRANK",
+  "confidence": 92,
+  "rank": "GENUS",
+  "status": "ACCEPTED",
+  "note": "nextMatch=0",
+  "alternatives": [
+    {
+      "usageKey": 11699867,
+      "scientificName": "Carcharodon spec Jordan, 1923",
+      "rank": "SPECIES",
+      "status": "ACCEPTED",
+      "confidence": 92,
+      "matchType": "EXACT"
+    },
+    {
+      "usageKey": 12043086,
+      "scientificName": "Carharodon",
+      "rank": "GENUS",
+      "status": "SYNONYM",
+      "confidence": 73,
+      "matchType": "FUZZY"
+    }
+  ]
+}

@@ -38,10 +38,19 @@ export default defineConfig({
       testMatch: /capturas\.spec\.ts/,
     },
   ],
-  webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      // WoRMS e GBIF simulados para a importação assistida.
+      command: 'node e2e/mock-apis.mjs',
+      url: 'http://127.0.0.1:4010/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 30_000,
+    },
+    {
+      command: 'npm run start',
+      url: 'http://localhost:3000',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });
