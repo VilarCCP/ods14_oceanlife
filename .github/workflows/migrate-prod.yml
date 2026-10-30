@@ -1,0 +1,64 @@
+name: Aplicar migrações (Supabase de PRODUÇÃO)
+
+# Disparo manual apenas (aba Actions → este workflow → Run workflow).
+# Por padrão faz só uma simulação (dry run) e lista o que seria aplicado.
+#
+# Configuração (Settings → Secrets and variables → Actions):
+#   Variável SUPABASE_PROD_PROJECT_REF   identificador do projeto de produção (não é segredo)
+#   Segredo  SUPABASE_ACCESS_TOKEN       o mesmo token pessoal usado no desenvolvimento
+#   Segredo  SUPABASE_PROD_DB_PASSWORD   senha do banco do projeto de PRODUÇÃO
+#
+# O seed.sql NUNCA é aplicado em produção: contém apenas dados fictícios.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Aplicar de verdade em PRODUÇÃO? (desmarcado = apenas simular)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-prod
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: supabase db push (produção)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Produção só recebe o que já está na main.
+    if: ${{ github.ref == 'refs/heads/main' }}
+    env:
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROD_PROJECT_REF }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PROD_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir configuração
+        run: |
+          missing=0
+          [ -n "$SUPABASE_PROJECT_REF" ] || { echo "::error::Defina a variável SUPABASE_PROD_PROJECT_REF."; missing=1; }
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "::error::Defina o segredo SUPABASE_ACCESS_TOKEN."; missing=1; }
+          [ -n "$SUPABASE_DB_PASSWORD" ] || { echo "::error::Defina o segredo SUPABASE_PROD_DB_PASSWORD."; missing=1; }
+          if [ "$SUPABASE_PROJECT_REF" = "yizuyqmqdiwtmijohrrj" ]; then
+            echo "::error::SUPABASE_PROD_PROJECT_REF aponta para o projeto de desenvolvimento."; missing=1
+          fi
+          exit $missing
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      - name: Vincular ao projeto de produção
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Simular (dry run)
+        run: supabase db push --dry-run
+
+      - name: Aplicar migrações
+        if: ${{ inputs.apply }}
+        run: supabase db push
