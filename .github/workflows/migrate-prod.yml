@@ -4,10 +4,13 @@ name: Aplicar migrações (Supabase de PRODUÇÃO)
 # Por padrão faz só uma simulação (dry run) e lista o que seria aplicado.
 # A simulação roda em qualquer branch; a aplicação real, só a partir da main.
 #
+# Conecta direto no banco pelo pooler do Supabase (modo sessão, IPv4), sem usar
+# token de conta: o workflow só tem acesso a este banco.
+#
 # Configuração (Settings → Secrets and variables → Actions):
 #   Variável SUPABASE_PROD_PROJECT_REF   identificador do projeto de produção (não é segredo)
-#   Segredo  SUPABASE_ACCESS_TOKEN       o mesmo token pessoal usado no desenvolvimento
 #   Segredo  SUPABASE_PROD_DB_PASSWORD   senha do banco do projeto de PRODUÇÃO
+#   Variável SUPABASE_PROD_POOLER_HOST   opcional; padrão: tenta aws-0 e aws-1 em sa-east-1
 #
 # O seed.sql NUNCA é aplicado em produção: contém apenas dados fictícios.
 on:
@@ -32,8 +35,8 @@ jobs:
     timeout-minutes: 15
     env:
       SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROD_PROJECT_REF }}
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PROD_DB_PASSWORD }}
+      POOLER_HOST: ${{ vars.SUPABASE_PROD_POOLER_HOST }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,7 +44,6 @@ jobs:
         run: |
           missing=0
           [ -n "$SUPABASE_PROJECT_REF" ] || { echo "::error::Defina a variável SUPABASE_PROD_PROJECT_REF."; missing=1; }
-          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "::error::Defina o segredo SUPABASE_ACCESS_TOKEN."; missing=1; }
           [ -n "$SUPABASE_DB_PASSWORD" ] || { echo "::error::Defina o segredo SUPABASE_PROD_DB_PASSWORD."; missing=1; }
           if [ "$SUPABASE_PROJECT_REF" = "yizuyqmqdiwtmijohrrj" ]; then
             echo "::error::SUPABASE_PROD_PROJECT_REF aponta para o projeto de desenvolvimento."; missing=1
@@ -52,12 +54,28 @@ jobs:
         with:
           version: 2.121.0
 
-      - name: Vincular ao projeto de produção
-        run: scripts/ci-run.sh 'Vincular ao projeto' supabase link --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Montar a conexão com o banco
+        run: |
+          password=$(python3 -c 'import os,urllib.parse;print(urllib.parse.quote(os.environ["SUPABASE_DB_PASSWORD"],safe=""))')
+          echo "::add-mask::$password"
+          errors=""
+          hosts="${POOLER_HOST:-aws-0-sa-east-1.pooler.supabase.com aws-1-sa-east-1.pooler.supabase.com}"
+          for host in $hosts; do
+            url="postgresql://postgres.${SUPABASE_PROJECT_REF}:${password}@${host}:5432/postgres"
+            if psql "$url" -tAc 'select 1' >/tmp/psql.txt 2>&1; then
+              echo "::notice title=Conexão::Conectado ao banco de produção por ${host}."
+              echo "DB_URL=$url" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            errors="${errors}%0A${host}: $(tr '\n' ' ' < /tmp/psql.txt | head -c 300)"
+          done
+          echo "::error title=Conexão::Não foi possível conectar ao banco de produção.${errors}%0AConfira a senha (SUPABASE_PROD_DB_PASSWORD) e, se preciso, defina SUPABASE_PROD_POOLER_HOST com o host do Session pooler mostrado em Connect no painel do Supabase."
+          exit 1
 
       - name: Simular (dry run)
         run: |
-          scripts/ci-run.sh 'Simulação' supabase db push --dry-run | tee /tmp/dry-run.txt
+          set -o pipefail
+          scripts/ci-run.sh 'Simulação' supabase db push --db-url "$DB_URL" --dry-run | tee /tmp/dry-run.txt
           summary="$(grep -vE '^\s*$' /tmp/dry-run.txt | tail -n 40)"
           summary="${summary//'%'/'%25'}"
           summary="${summary//$'\n'/'%0A'}"
@@ -71,4 +89,4 @@ jobs:
 
       - name: Aplicar migrações
         if: ${{ inputs.apply && github.ref == 'refs/heads/main' }}
-        run: scripts/ci-run.sh 'Aplicar migrações' supabase db push
+        run: scripts/ci-run.sh 'Aplicar migrações' supabase db push --db-url "$DB_URL"
