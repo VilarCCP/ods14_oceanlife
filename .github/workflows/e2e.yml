@@ -2,6 +2,9 @@ name: E2E
 
 # Site público de ponta a ponta: Supabase local com dados fictícios, build de
 # produção do Next.js e testes no navegador (Playwright).
+# Observação: commits gravados por workflows (lockfile, formatação, tipos) usam o
+# token do GitHub e não disparam outros workflows; nesses casos, rode este
+# workflow manualmente pela aba Actions ou com um novo push.
 on:
   push:
     branches: ['**']

@@ -2,6 +2,9 @@ name: Banco de dados
 
 # Aplica todas as migrações num Supabase local (no próprio runner do GitHub,
 # que tem Docker) e roda os testes pgTAP de restrições, RLS e Storage.
+# Observação: commits gravados por workflows (lockfile, formatação, tipos) usam o
+# token do GitHub e não disparam outros workflows; nesses casos, rode este
+# workflow manualmente pela aba Actions ou com um novo push.
 on:
   push:
     branches: ['**']
