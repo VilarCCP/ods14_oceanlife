@@ -1,0 +1,26 @@
+[
+  {
+    "AphiaID": 105742,
+    "scientificname": "Carcharodon",
+    "status": "accepted",
+    "rank": "Genus",
+    "valid_AphiaID": 105742,
+    "valid_name": "Carcharodon"
+  },
+  {
+    "AphiaID": 298584,
+    "scientificname": "Carcharodon albimors",
+    "status": "unaccepted",
+    "rank": "Species",
+    "valid_AphiaID": 105838,
+    "valid_name": "Carcharodon carcharias"
+  },
+  {
+    "AphiaID": 105838,
+    "scientificname": "Carcharodon carcharias",
+    "status": "accepted",
+    "rank": "Species",
+    "valid_AphiaID": 105838,
+    "valid_name": "Carcharodon carcharias"
+  }
+]

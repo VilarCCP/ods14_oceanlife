@@ -19,7 +19,8 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "verify": "npm run check:secrets && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build",
     "test:integration": "vitest run --project integration",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:contract": "vitest run --project contract"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

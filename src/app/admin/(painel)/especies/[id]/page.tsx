@@ -36,7 +36,9 @@ export default async function EditSpeciesPage({
   if (!species.ok) throw new Error('Falha ao carregar a espécie.');
   if (!species.data) notFound();
   const item = species.data;
-  const created = firstParam((await searchParams).criada) === '1';
+  const query = await searchParams;
+  const created = firstParam(query.criada) === '1';
+  const imported = firstParam(query.importada) === '1';
 
   return (
     <>
@@ -64,6 +66,12 @@ export default async function EditSpeciesPage({
         ) : null}
       </p>
 
+      {imported ? (
+        <p className="admin-flash admin-flash--success" role="status">
+          Dados importados e fontes registradas. Revise a espécie; nada foi publicado.
+        </p>
+      ) : null}
+
       {created ? (
         <p className="admin-flash admin-flash--success" role="status">
           Rascunho criado. Agora adicione imagens e fontes; publique quando estiver pronto.
@@ -89,7 +97,15 @@ export default async function EditSpeciesPage({
       </section>
 
       <section id="dados" aria-labelledby="titulo-dados">
-        <h2 id="titulo-dados">Dados da espécie</h2>
+        <div className="admin-page-head">
+          <h2 id="titulo-dados">Dados da espécie</h2>
+          <Link
+            className="button button--small button--quiet"
+            href={`/admin/especies/importar?especie=${item.id}`}
+          >
+            Importar dados taxonômicos (WoRMS/GBIF)
+          </Link>
+        </div>
         <SpeciesForm
           mode="edit"
           speciesId={item.id}

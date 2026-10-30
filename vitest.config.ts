@@ -29,6 +29,15 @@ export default defineConfig({
           fileParallelism: false,
         },
       },
+      {
+        // Contra as APIs reais do WoRMS e do GBIF (RUN_CONTRACT_TESTS=1).
+        extends: true,
+        test: {
+          name: 'contract',
+          include: ['tests/contract/**/*.test.ts'],
+          testTimeout: 30_000,
+        },
+      },
     ],
   },
 });
