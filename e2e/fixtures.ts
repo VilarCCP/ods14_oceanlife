@@ -54,3 +54,17 @@ export const TINY_PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
   'base64',
 );
+
+/** Usuários de teste do painel. As senhas são geradas a cada execução. */
+export const E2E_USERS = {
+  admin: 'e2e-admin@teste.invalid',
+  comum: 'e2e-comum@teste.invalid',
+} as const;
+
+/** Arquivo (fora do Git) onde o global-setup grava as senhas geradas. */
+export const USERS_FILE = 'e2e/.tmp/usuarios.json';
+
+export interface E2ECredentials {
+  admin: { email: string; password: string };
+  comum: { email: string; password: string };
+}

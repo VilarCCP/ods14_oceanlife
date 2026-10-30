@@ -670,3 +670,36 @@ export async function deleteSpecies(
     return failFromException(exception);
   }
 }
+
+/** Todos os grupos educativos (D8), na ordem definida, para o formulário do painel. */
+export async function listAllGroups(client: TypedSupabaseClient): Promise<Result<SpeciesGroup[]>> {
+  try {
+    const { data, error } = await client
+      .from('species_groups')
+      .select('slug, label')
+      .order('sort_order', { ascending: true });
+    if (error) return failFromDatabase(error);
+    return ok(data ?? []);
+  } catch (exception) {
+    return failFromException(exception);
+  }
+}
+
+/** Nome popular atual (usado para confirmar a exclusão). `null` se não existir. */
+export async function getSpeciesCommonName(
+  client: TypedSupabaseClient,
+  id: string,
+): Promise<Result<string | null>> {
+  if (!isUuid(id)) return ok(null);
+  try {
+    const { data, error } = await client
+      .from('species')
+      .select('common_name')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) return failFromDatabase(error);
+    return ok(data?.common_name ?? null);
+  } catch (exception) {
+    return failFromException(exception);
+  }
+}

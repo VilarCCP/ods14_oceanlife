@@ -45,3 +45,15 @@ export function providerLabel(provider: string): string {
 export function speciesCount(total: number): string {
   return total === 1 ? '1 espécie' : `${total} espécies`;
 }
+
+const DATE_TIME = new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'short',
+  timeStyle: 'short',
+  timeZone: 'America/Sao_Paulo',
+});
+
+/** Instante (timestamptz) no horário de Brasília: "21/10/2026, 09:30". */
+export function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : DATE_TIME.format(date);
+}

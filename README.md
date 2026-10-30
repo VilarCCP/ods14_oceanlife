@@ -3,7 +3,7 @@
 Plataforma educativa para explorar espécies marinhas e aprender sobre a conservação
 dos oceanos, alinhada à **ODS 14 — Vida na Água**.
 
-> Projeto em desenvolvimento. Estado atual: **fase 05 — site público**.
+> Projeto em desenvolvimento. Estado atual: **fase 06 — painel administrativo**.
 
 ## Documentação
 
@@ -101,8 +101,11 @@ que as utilizam.
 
 ### Configuração do projeto Supabase (uma vez)
 
-1. **Authentication → Sign In / Providers:** desligue _Allow new users to sign up_.
-2. **Authentication → Users → Invite user:** convide cada administrador por e-mail.
+1. **Authentication → Sign In / Providers:** desligue _Allow new users to sign up_ e mantenha
+   o provedor **Email** ativo (é o login do painel).
+2. **Authentication → Users → Add user → Create new user:** informe o e-mail e uma senha
+   forte da pessoa administradora e marque _Auto Confirm User_. Entregue a senha por um canal
+   privado. (O painel usa e-mail e senha; não depende do envio de e-mails do Supabase.)
 3. **SQL Editor:** autorize o administrador (troque o e-mail):
 
    ```sql
@@ -111,6 +114,25 @@ que as utilizam.
    ```
 
    Ser usuário autenticado não basta: só quem está em `admin_users` acessa o painel.
+
+4. Para **revogar** o acesso: `delete from public.admin_users where user_id = (select id from auth.users where email = 'pessoa@exemplo.com');`
+   Para trocar uma senha: **Authentication → Users →** (usuário) **→ Reset password** ou
+   remova e crie o usuário de novo.
+
+## Painel administrativo
+
+Acesse `/admin`. Sem login, qualquer página do painel leva a `/admin/login`; contas sem
+autorização veem um aviso de acesso negado. No painel é possível:
+
+- ver o resumo (publicadas e rascunhos) e a lista com pesquisa, filtro e ordenação;
+- cadastrar e editar espécies (rascunho), com aviso de nome científico repetido;
+- enviar imagens (prévia, texto alternativo obrigatório, crédito e licença), escolher a capa,
+  ordenar e excluir;
+- registrar fontes manuais e corrigir ou remover fontes;
+- publicar (com a lista do que falta), retirar do site e excluir com confirmação.
+
+O formulário guarda no navegador uma cópia das alterações não salvas; se a sessão expirar,
+é possível entrar de novo e recuperá-las.
 
 ## Variáveis de ambiente
 
