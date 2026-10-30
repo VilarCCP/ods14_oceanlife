@@ -163,6 +163,16 @@ considerada concluída sem verificação.
 | Testes                  | Unitários com respostas reais gravadas (`tests/fixtures/apis`); E2E com servidor simulado (`e2e/mock-apis.mjs`); contrato contra as APIs reais num job do CI não bloqueante.                                                                       |
 | Termos de uso           | WoRMS: citar a fonte (o registro traz a citação) e o WoRMS Editorial Board (doi:10.14284/170). GBIF: atribuição no estilo CC BY, sem garantia de exatidão dos dados. Ambos registrados em cada fonte.                                              |
 
+## Fase 08 — testes e validação
+
+| Tema                     | Escolha                                                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Acessibilidade           | `@axe-core/playwright` (dependência de desenvolvimento, versão exata) com as regras WCAG 2.1 A e AA em todas as páginas públicas e do painel.                  |
+| Novas dependências       | Sem acesso ao registro npm no ambiente do assistente, o workflow do lockfile instala os nomes listados em `scripts/novas-dependencias-dev.txt` com versão exata. |
+| Estados de falha         | Projeto Playwright `falhas`: para o contêiner da API de dados do Supabase local e confere as mensagens do site e do painel.                                     |
+| Sessão expirada          | O proxy só redireciona navegações (GET/HEAD); envios de formulário chegam à ação, que responde "Sua sessão expirou" sem perder o que foi digitado.             |
+| Matriz de aceite         | `docs/validacao.md` liga cada critério dos documentos 01, 02 e 03 à sua evidência.                                                                            |
+
 ## Limites dos serviços gratuitos (consultados em 21/10/2026)
 
 Os limites mudam; conferir de novo antes da publicação (fase 09).

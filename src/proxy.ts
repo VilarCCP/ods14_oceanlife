@@ -41,7 +41,11 @@ export async function proxy(request: NextRequest) {
   }
 
   const isPublicAdminPage = pathname === '/admin/login';
-  if (!signedIn && !isPublicAdminPage) {
+  // Só navegações (GET/HEAD) são redirecionadas. Envios de formulário (Server
+  // Actions, POST) seguem até a ação, que responde "Sua sessão expirou" sem
+  // descartar o que foi digitado (doc 03 §13).
+  const isNavigation = request.method === 'GET' || request.method === 'HEAD';
+  if (!signedIn && !isPublicAdminPage && isNavigation) {
     const login = request.nextUrl.clone();
     login.pathname = '/admin/login';
     login.search = '';

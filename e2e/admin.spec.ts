@@ -257,6 +257,42 @@ test.describe('fluxo do administrador', () => {
     await expect(page.getByText('Alterações salvas e já visíveis no site.')).toBeVisible();
   });
 
+  test('envia várias imagens de uma vez e reordena a galeria', async () => {
+    await page.goto(editUrl);
+    await page.getByLabel('Escolher arquivos').setInputFiles([
+      { name: 'segunda.png', mimeType: 'image/png', buffer: TINY_PNG },
+      { name: 'terceira.png', mimeType: 'image/png', buffer: TINY_PNG },
+    ]);
+    const pending = page.getByRole('list', { name: 'Imagens a enviar' });
+    const alts = pending.getByLabel(/Texto alternativo/);
+    await expect(alts).toHaveCount(2);
+    await alts.nth(0).fill('Segunda foto fictícia');
+    await alts.nth(1).fill('Terceira foto fictícia');
+    await page.getByRole('button', { name: 'Enviar 2 imagens' }).click();
+
+    const gallery = page.getByRole('list', { name: 'Imagens na ordem da galeria' });
+    await expect(gallery.getByRole('listitem')).toHaveCount(3);
+
+    // A terceira sobe para a segunda posição.
+    await page.getByRole('button', { name: 'Mover para cima (imagem 3)' }).click();
+    await expect(gallery.getByRole('listitem').nth(1)).toContainText('Terceira foto fictícia');
+    await expect(gallery.getByRole('listitem').nth(2)).toContainText('Segunda foto fictícia');
+
+    // O site mostra a mesma ordem.
+    const site = await context.newPage();
+    await site.goto(`/especies/${NEW_SPECIES.slug}`);
+    const order = await site
+      .getByRole('region', { name: 'Galeria' })
+      .getByRole('img')
+      .evaluateAll((images) => images.map((image) => image.getAttribute('alt')));
+    expect(order).toEqual([
+      'Foto fictícia enviada pelo teste',
+      'Terceira foto fictícia',
+      'Segunda foto fictícia',
+    ]);
+    await site.close();
+  });
+
   test('fontes: exige título ou endereço, adiciona e remove', async () => {
     await page.goto(editUrl);
     const sources = page.locator('#fontes');

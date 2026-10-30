@@ -84,6 +84,9 @@ jobs:
       - name: Testes E2E
         run: scripts/ci-run.sh 'testes E2E' npx playwright test --project=desktop --project=celular
 
+      - name: Estados de falha (banco fora do ar)
+        run: scripts/ci-run.sh 'testes de falha' npx playwright test --project=falhas
+
       - name: Capturas de tela para revisão visual
         if: ${{ !cancelled() }}
         run: npx playwright test --project=capturas

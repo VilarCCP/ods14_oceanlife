@@ -24,12 +24,18 @@ export default defineConfig({
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'] },
-      testIgnore: /(capturas|mobile)\.spec\.ts/,
+      testIgnore: /(capturas|mobile|falhas)\.spec\.ts/,
     },
     {
       name: 'celular',
       use: { ...devices['Pixel 7'] },
       testMatch: /mobile\.spec\.ts/,
+    },
+    {
+      // Derruba a API de dados do Supabase local; roda sozinho, depois dos demais.
+      name: 'falhas',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /falhas\.spec\.ts/,
     },
     {
       // Capturas de tela para revisão visual (não fazem asserções de layout).
