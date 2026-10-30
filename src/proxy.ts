@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { fetchWithTimeout } from '@/lib/supabase/fetch';
+
 /**
  * Proxy do painel (antigo "middleware"): renova a sessão do Supabase nos
  * cookies e manda quem não está logado para a tela de login.
@@ -16,6 +18,7 @@ export async function proxy(request: NextRequest) {
   if (!url || !key) return response;
 
   const supabase = createServerClient(url, key, {
+    global: { fetch: fetchWithTimeout },
     cookies: {
       getAll() {
         return request.cookies.getAll();

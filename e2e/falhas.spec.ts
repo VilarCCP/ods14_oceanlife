@@ -45,7 +45,8 @@ async function waitForRestBack(baseUrl: string) {
 }
 
 test.describe('com o banco indisponível', () => {
-  test.describe.configure({ mode: 'serial' });
+  // As consultas ao banco desistem após 15 s (src/lib/supabase/fetch.ts).
+  test.describe.configure({ mode: 'serial', timeout: 60_000 });
   const supabaseUrl = process.env.SUPABASE_TEST_URL ?? 'http://127.0.0.1:54321';
 
   let adminContext: BrowserContext;
