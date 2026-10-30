@@ -2,8 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Atkinson_Hyperlegible, Newsreader } from 'next/font/google';
 import type { ReactNode } from 'react';
 
-import { SiteFooter } from '@/components/layout/SiteFooter';
-import { SiteHeader } from '@/components/layout/SiteHeader';
 import { siteConfig, siteUrl } from '@/lib/site';
 
 import './globals.css';
@@ -42,26 +40,14 @@ export const viewport: Viewport = {
   themeColor: '#176f88',
 };
 
+/**
+ * Layout raiz: só o documento e as fontes. O site público usa o grupo (site)
+ * e o painel usa /admin, cada um com sua própria moldura.
+ */
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang={siteConfig.locale} className={`${newsreader.variable} ${atkinson.variable}`}>
-      <body>
-        {/* Ambiente decorativo: invisível para leitores de tela. */}
-        <div className="ocean-light" aria-hidden="true" />
-        <div className="ocean-snow" aria-hidden="true" />
-        <div className="depth-line" aria-hidden="true" />
-
-        <div className="site">
-          <a className="skip-link" href="#conteudo">
-            Pular para o conteúdo
-          </a>
-          <SiteHeader />
-          <main id="conteudo" className="site-main" tabIndex={-1}>
-            {children}
-          </main>
-          <SiteFooter />
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

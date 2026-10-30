@@ -1,6 +1,8 @@
-import { E2E_PREFIX, e2eServiceClient } from './fixtures';
+import { rmSync } from 'node:fs';
 
-/** Remove as espécies de teste (com prefixo e2e-) e seus arquivos. */
+import { E2E_PREFIX, e2eServiceClient, USERS_FILE } from './fixtures';
+
+/** Remove as espécies (prefixo e2e-), seus arquivos e os usuários de teste. */
 export default async function globalTeardown() {
   const client = e2eServiceClient();
   const { data } = await client.from('species').select('id').like('slug', `${E2E_PREFIX}%`);
@@ -13,4 +15,10 @@ export default async function globalTeardown() {
     await client.from('species').update({ is_published: false }).eq('id', row.id);
     await client.from('species').delete().eq('id', row.id);
   }
+
+  const users = await client.auth.admin.listUsers({ perPage: 1000 });
+  for (const user of users.data?.users ?? []) {
+    if (user.email?.startsWith(E2E_PREFIX)) await client.auth.admin.deleteUser(user.id);
+  }
+  rmSync(USERS_FILE, { force: true });
 }

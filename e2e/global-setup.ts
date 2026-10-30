@@ -1,6 +1,16 @@
 import { randomUUID } from 'node:crypto';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
-import { E2E_PREFIX, e2eServiceClient, fixtures, TINY_PNG } from './fixtures';
+import {
+  E2E_PREFIX,
+  E2E_USERS,
+  e2eServiceClient,
+  fixtures,
+  TINY_PNG,
+  USERS_FILE,
+  type E2ECredentials,
+} from './fixtures';
 import globalTeardown from './global-teardown';
 
 type Client = ReturnType<typeof e2eServiceClient>;
@@ -107,6 +117,26 @@ export default async function globalSetup() {
   await publish(client, accented);
 
   await insertSpecies(client, fixtures.draft, { short_description: 'Não deve aparecer no site.' });
+
+  // Usuários do painel: um administrador e um usuário comum, sem permissão.
+  const credentials = {} as E2ECredentials;
+  for (const role of ['admin', 'comum'] as const) {
+    const email = E2E_USERS[role];
+    const password = `E2e-${randomUUID()}`;
+    const created = await client.auth.admin.createUser({ email, password, email_confirm: true });
+    if (created.error || !created.data.user) {
+      throw new Error(`Falha ao criar usuário ${email}: ${created.error?.message}`);
+    }
+    if (role === 'admin') {
+      const { error } = await client
+        .from('admin_users')
+        .insert({ user_id: created.data.user.id, note: 'administrador dos testes E2E' });
+      if (error) throw new Error(`Falha ao autorizar administrador: ${error.message}`);
+    }
+    credentials[role] = { email, password };
+  }
+  mkdirSync(dirname(USERS_FILE), { recursive: true });
+  writeFileSync(USERS_FILE, JSON.stringify(credentials), { mode: 0o600 });
 
   const check = await client.from('species').select('slug').like('slug', `${E2E_PREFIX}%`);
   if ((check.data ?? []).length !== 4) throw new Error('Os dados de teste não foram criados.');

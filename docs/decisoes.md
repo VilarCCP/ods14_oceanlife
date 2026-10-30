@@ -130,6 +130,22 @@ considerada concluída sem verificação.
 | Renderização             | Páginas com dados do banco são renderizadas a cada visita (publicar ou retirar aparece na hora). O site usa o cliente sempre anônimo.                                                                                           |
 | Testes E2E               | Playwright no workflow **E2E**: Supabase local com dados fictícios (prefixo `e2e-`), build de produção, desktop e celular. Capturas de tela vão para a branch `capturas/<branch>` para revisão visual.                          |
 
+## Fase 06 — painel administrativo
+
+| Tema                        | Escolha                                                                                                                                                                                                                               |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login (aprovado 30/10/2026) | **E-mail e senha** pelo Supabase Auth. Administradores são criados no painel do Supabase (_Add user_, _Auto Confirm_) e autorizados por SQL em `admin_users`. Não depende do envio de e-mails do plano gratuito.                      |
+| Mensagens de login          | Sempre "E-mail ou senha incorretos.", sem revelar se o e-mail existe. Muitas tentativas e falha de conexão têm mensagens próprias.                                                                                                    |
+| Proteção                    | `src/proxy.ts` renova a sessão e redireciona quem não está logado. Cada página e cada ação verificam sessão e permissão no servidor (`src/lib/auth.ts`) e a RLS reforça no banco.                                                     |
+| Destino após login          | Só caminhos internos de `/admin` (`safeAdminPath`), evitando redirecionamento para outros sites.                                                                                                                                      |
+| Ações (D5)                  | Todas as operações do painel, inclusive pedir a URL assinada de envio, são Server Actions. O arquivo de imagem nunca passa pelo servidor da Vercel (D3), então não há Route Handler de upload.                                        |
+| Layouts                     | Site público no grupo `(site)` com o ambiente "descida pelo oceano"; painel em `/admin` com visual calmo e sólido, sem animação.                                                                                                      |
+| Formulário                  | Validação no navegador com o mesmo esquema Zod do servidor; resumo de erros com links para os campos; aviso de alterações não salvas; cópia local (D12) com opção de recuperar ou descartar; botão desabilitado durante o salvamento. |
+| Imagens                     | Prévia local, texto alternativo obrigatório em toda imagem, envio um arquivo por vez (a falha de um não afeta os outros), ordenação por botões "mover para cima/baixo" (acessível por teclado), exclusão em duas etapas.              |
+| Exclusão de espécie         | Seção separada; exige digitar o nome popular, conferido de novo no servidor. Exclusão física (sem exclusão lógica no MVP).                                                                                                            |
+| Resumo                      | Só publicadas e rascunhos. "Itens incompletos" ficou de fora por não haver contagem confiável sem consultar cada espécie.                                                                                                             |
+| Testes                      | E2E do painel com administrador e usuário comum criados no Supabase local a cada execução (senhas aleatórias, removidos ao final).                                                                                                    |
+
 ## Limites dos serviços gratuitos (consultados em 21/10/2026)
 
 Os limites mudam; conferir de novo antes da publicação (fase 09).
