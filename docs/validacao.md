@@ -102,6 +102,16 @@ dependem de espécies publicadas.
   navegador recebia a página de login no lugar da resposta da ação. Agora só as
   navegações (GET/HEAD) são redirecionadas; a ação responde "Sua sessão expirou" e o
   texto digitado continua no formulário.
+- **Páginas carregando sem fim com o banco fora do ar.** As consultas do servidor ao
+  Supabase não tinham tempo limite. Agora desistem após 15 s
+  (`src/lib/supabase/fetch.ts`) e a página mostra a mensagem de erro.
+- **Título "Espécie não encontrada" numa falha do banco.** A página da espécie
+  mostrava o erro certo, mas o título dizia que a espécie não existia. Agora o título
+  é "Não foi possível carregar a espécie".
+- **Administrador recebia "sem permissão" com o banco fora do ar.** Uma falha na
+  verificação `is_admin()` era tratada como acesso negado. Agora é tratada como
+  indisponibilidade, e o painel mostra a tela de erro com "Tentar novamente"
+  (`src/app/admin/error.tsx`).
 
 ## Pendente para a fase 09
 
