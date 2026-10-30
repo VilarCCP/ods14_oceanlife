@@ -30,8 +30,7 @@ import { createSpeciesDraft, getSpeciesForEdit, updateSpecies } from '@/services
 import { searchWormsByName, type WormsRecord } from '@/services/worms.service';
 
 export type SearchOutcome<T> =
-  | { status: 'ok'; items: T[] }
-  | { status: 'error'; reason: ExternalFailure; message: string };
+  { status: 'ok'; items: T[] } | { status: 'error'; reason: ExternalFailure; message: string };
 
 export interface ExternalSearchResult {
   term: string;
